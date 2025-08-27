@@ -13,9 +13,9 @@ namespace RecomendationService.Domain
         public Guid UserActivitiesId { get; set; }
 
         [BsonElement("LikedUsers")]
-        List<Guid> LikedUsers { get; set; } = new List<Guid>();
+        public List<Guid> LikedUsers { get; set; } = new List<Guid>();
 
         [BsonElement("DislikedUsers")]
-        List<Guid> DislikedUsers { get; set; } = new List<Guid>();
+        public List<Guid> DislikedUsers { get; set; } = new List<Guid>();
     }
 }

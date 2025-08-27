@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-builder.Services.InfrastructureServices();
+builder.Services.InfrastructureServices(builder.Configuration);
 builder.Services.ApplicationServices();
 
 builder.Host.UseSerilog((context, configuration) =>

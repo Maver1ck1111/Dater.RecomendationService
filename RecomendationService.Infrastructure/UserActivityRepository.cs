@@ -3,6 +3,8 @@ using RecomendationService.Application.RepositoryContracts;
 using MongoDB;
 using MongoDB.Driver;
 using RecomendationService.Domain;
+using RecomendationService.Application;
+
 namespace RecomendationService.Infrastructure
 {
     public class UserActivityRepository : IUserActivityRepository
@@ -14,7 +16,23 @@ namespace RecomendationService.Infrastructure
             _logger = logger;
             _collection = collection;
         }
-        public Task RecordUserActivityAsync(Guid userId, string activityType)
+
+        public Task<Result> CreateUserActivityAsync(Guid userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result<List<Guid>>> GetDislikedUsersAsync(Guid userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result<List<Guid>>> GetLikedUsersAsync(Guid userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result> RecordUserActivityAsync(Guid userId, string activityType)
         {
             throw new NotImplementedException();
         }

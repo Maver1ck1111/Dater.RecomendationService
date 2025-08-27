@@ -1,5 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MongoDB.Bson.Serialization.Serializers;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using RecomendationService.Application.RepositoryContracts;
 using RecomendationService.Domain;
@@ -17,7 +20,7 @@ namespace RecomendationService.Infrastructure
             var database = mongoClient.GetDatabase("RecomendationService");
 
             var collection = database.GetCollection<UserActivities>("UserActivities");
-
+          
             services.AddSingleton<IMongoCollection<UserActivities>>(collection);
 
             return services;

@@ -18,9 +18,9 @@ namespace RecomendationService.Tests
         private readonly Mock<ILogger<UserActivityRepository>> _mockLogger = new Mock<ILogger<UserActivityRepository>>();
         private readonly IMongoCollection<UserActivities> _activities;
         private readonly UserActivityRepository _repository;
-        public RepositoryTests(IMongoCollection<UserActivities> collection)
+        public RepositoryTests()
         {
-            _activities = collection;
+            _activities = DbContext.GetCollection();
             _repository = new UserActivityRepository(_mockLogger.Object, _activities);
         }
 
@@ -35,7 +35,7 @@ namespace RecomendationService.Tests
 
             var filter = Builders<UserActivities>.Filter.Eq(ua => ua.UserActivitiesId, activityID);
 
-            var createdActivity = await _activities.FindAsync(filter) as UserActivities;
+            var createdActivity = await (await _activities.FindAsync(filter)).FirstOrDefaultAsync();
 
             createdActivity.Should().NotBeNull();
             createdActivity.UserActivitiesId.Should().Be(activityID);
@@ -63,20 +63,21 @@ namespace RecomendationService.Tests
         public async Task RecordUserActivity_ShouldReturnCorrectResponse()
         {
             Guid activityID = Guid.NewGuid();
+            Guid targetUserID = Guid.NewGuid();
 
             await _activities.InsertOneAsync(new UserActivities { UserActivitiesId = activityID });
 
-            var result = await _repository.RecordUserActivityAsync(activityID, "like");
+            var result = await _repository.RecordUserActivityAsync(activityID, targetUserID, "like");
 
             result.StatusCode.Should().Be(200);
 
             var filter = Builders<UserActivities>.Filter.Eq(ua => ua.UserActivitiesId, activityID);
 
-            var recorderActivity = await _activities.FindAsync(filter) as UserActivities;
+            var recorderActivity = await (await _activities.FindAsync(filter)).FirstOrDefaultAsync();
 
             recorderActivity.Should().NotBeNull();
             recorderActivity.UserActivitiesId.Should().Be(activityID);
-            recorderActivity.LikedUsers.Should().Contain(activityID);
+            recorderActivity.LikedUsers.Should().Contain(targetUserID);
         }
 
         [Fact]
@@ -86,14 +87,14 @@ namespace RecomendationService.Tests
 
             await _activities.InsertOneAsync(new UserActivities { UserActivitiesId = activityID });
 
-            var result = await _repository.RecordUserActivityAsync(activityID, "wrongType");
+            var result = await _repository.RecordUserActivityAsync(activityID, Guid.NewGuid(), "wrongType");
             result.StatusCode.Should().Be(400);
         }
 
         [Fact]
         public async Task RecordUserActivity_ShouldReturn404NotFound_ActivityNotExist()
         {
-            var result = await _repository.RecordUserActivityAsync(Guid.NewGuid(), "like");
+            var result = await _repository.RecordUserActivityAsync(Guid.NewGuid(), Guid.NewGuid(), "like");
             result.StatusCode.Should().Be(404);
         }
 
@@ -130,15 +131,15 @@ namespace RecomendationService.Tests
         public async Task GetDislikedUsersAsync_ShouldReturnCorrectResponse()
         {
             Guid activityID = Guid.NewGuid();
-            Guid likedPersonID = Guid.NewGuid();
+            Guid disLikedPersonID = Guid.NewGuid();
 
-            await _activities.InsertOneAsync(new UserActivities { UserActivitiesId = activityID, LikedUsers = new List<Guid>() { likedPersonID } });
+            await _activities.InsertOneAsync(new UserActivities { UserActivitiesId = activityID, DislikedUsers = new List<Guid>() { disLikedPersonID } });
 
             var result = await _repository.GetDislikedUsersAsync(activityID);
 
             result.StatusCode.Should().Be(200);
             result.Value.Should().NotBeNull();
-            result.Value.Should().Contain(likedPersonID);
+            result.Value.Should().Contain(disLikedPersonID);
         }
 
         [Fact]

@@ -57,3 +57,5 @@ nunit-*.xml
 
 appsettings.json
 launchSettings.json
+
+DbContext.cs

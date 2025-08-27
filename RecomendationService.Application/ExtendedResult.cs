@@ -13,7 +13,7 @@ namespace RecomendationService.Application
         {
             return new Result<T> { Value = value, StatusCode = statusCode };
         }
-        public static new Result<T> Failure(int statusCode, string errorMessage, T value = default)
+        public static Result<T> Failure(int statusCode, string errorMessage, T? value = default)
         {
             return new Result<T> { ErrorMessage = errorMessage, StatusCode = statusCode, Value = value };
         }

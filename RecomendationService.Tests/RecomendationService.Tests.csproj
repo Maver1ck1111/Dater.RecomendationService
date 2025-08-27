@@ -17,6 +17,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RecomendationService.Application\RecomendationService.Application.csproj" />
+    <ProjectReference Include="..\RecomendationService.Infrastructure\RecomendationService.Infrastructure.csproj" />
+    <ProjectReference Include="..\RecomendationService.WebApi\RecomendationService.WebApi.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 

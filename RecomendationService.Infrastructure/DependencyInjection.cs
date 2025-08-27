@@ -1,11 +1,25 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using MongoDB.Driver;
+using RecomendationService.Application.RepositoryContracts;
+using RecomendationService.Domain;
 
 namespace RecomendationService.Infrastructure
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection InfrastructureServices(this IServiceCollection services)
+        public static IServiceCollection InfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddScoped<IUserActivityRepository, UserActivityRepository>();
+
+            var mongoClient = new MongoClient(configuration["ConnectionString"]!);
+
+            var database = mongoClient.GetDatabase("RecomendationService");
+
+            var collection = database.GetCollection<UserActivities>("UserActivities");
+
+            services.AddSingleton<IMongoCollection<UserActivities>>(collection);
+
             return services;
         }
     }

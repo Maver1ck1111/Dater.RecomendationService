@@ -54,3 +54,6 @@ TestResult.xml
 nunit-*.xml
 
 .vs
+
+appsettings.json
+launchSettings.json

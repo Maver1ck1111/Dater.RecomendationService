@@ -156,6 +156,93 @@ namespace RecomendationService.Tests
             result.StatusCode.Should().Be(404);
         }
 
+        [Fact]
+        public async Task GetLikesFromUsersAsync_ShouldReturnCorrectResponse()
+        {
+            Guid activityID = Guid.NewGuid();
+            Guid likedByPersonID = Guid.NewGuid();
 
+            await _activities.InsertOneAsync(new UserActivities { UserActivitiesId = activityID, LikesFromUsers = new List<Guid>() { likedByPersonID } });
+
+            var result = await _repository.GetLikesFromUsersAsync(activityID);
+
+            result.StatusCode.Should().Be(200);
+            result.Value.Should().NotBeNull();
+            result.Value.Should().Contain(likedByPersonID);
+        }
+
+        [Fact]
+        public async Task GetLikesFromUsersAsync_ShouldReturn400BadRequest_EmptyId()
+        {
+            var result = await _repository.GetLikesFromUsersAsync(Guid.Empty);
+            result.StatusCode.Should().Be(400);
+        }
+
+        [Fact]
+        public async Task GetLikesFromUsersAsync_ShouldReturn404NotFound_ActivityNotExist()
+        {
+            var result = await _repository.GetLikesFromUsersAsync(Guid.NewGuid());
+            result.StatusCode.Should().Be(404);
+        }
+
+        [Fact]
+        public async Task AddLikeFromUserAsync_ShouldReturnCorrectResponse()
+        {
+            Guid userID = Guid.NewGuid();
+            Guid likedByUserID = Guid.NewGuid();
+
+            await _activities.InsertOneAsync(new UserActivities { UserActivitiesId = userID });
+
+            var result = await _repository.AddLikeFromUserAsync(userID, likedByUserID);
+
+            result.StatusCode.Should().Be(200);
+        }
+
+        [Fact]
+        public async Task AddLikeFromUserAsync_ShouldReturn400BadRequest_EmptyId()
+        {
+            var result = await _repository.AddLikeFromUserAsync(Guid.Empty, Guid.NewGuid());
+            result.StatusCode.Should().Be(400);
+
+            result = await _repository.AddLikeFromUserAsync(Guid.NewGuid(), Guid.Empty);
+            result.StatusCode.Should().Be(400);
+        }
+
+        [Fact]
+        public async Task AddLikeFromUserAsync_ShouldReturn404NotFound_ActivityNotExist()
+        {
+            var result = await _repository.AddLikeFromUserAsync(Guid.NewGuid(), Guid.NewGuid());
+            result.StatusCode.Should().Be(404);
+        }
+
+        [Fact]
+        public async Task RemoveLikeFromUserAsync_ShouldReturnCorrectResponse()
+        {
+            Guid userID = Guid.NewGuid();
+            Guid likedByUserID = Guid.NewGuid();
+
+            await _activities.InsertOneAsync(new UserActivities { UserActivitiesId = userID, LikesFromUsers = new List<Guid>() { likedByUserID } });
+
+            var result = await _repository.RemoveLikeFromUserAsync(userID, likedByUserID);
+
+            result.StatusCode.Should().Be(200);
+        }
+
+        [Fact]
+        public async Task RemoveLikeFromUserAsync_ShouldReturn400BadRequest_EmptyId()
+        {
+            var result = await _repository.RemoveLikeFromUserAsync(Guid.Empty, Guid.NewGuid());
+            result.StatusCode.Should().Be(400);
+
+            result = await _repository.RemoveLikeFromUserAsync(Guid.NewGuid(), Guid.Empty);
+            result.StatusCode.Should().Be(400);
+        }
+
+        [Fact]
+        public async Task RemoveLikeFromUserAsync_ShouldReturn404NotFound_ActivityNotExist()
+        {
+            var result = await _repository.RemoveLikeFromUserAsync(Guid.NewGuid(), Guid.NewGuid());
+            result.StatusCode.Should().Be(404);
+        }
     }
 }

@@ -21,5 +21,9 @@ namespace RecomendationService.Domain
         [BsonElement("DislikedUsers")]
         [BsonRepresentation(BsonType.String)]
         public List<Guid> DislikedUsers { get; set; } = new List<Guid>();
+
+        [BsonElement("LikesFromUsers")]
+        [BsonRepresentation(BsonType.String)]
+        public List<Guid> LikesFromUsers { get; set; } = new List<Guid>();
     }
 }

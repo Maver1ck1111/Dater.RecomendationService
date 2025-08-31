@@ -17,6 +17,36 @@ namespace RecomendationService.Infrastructure
             _collection = collection;
         }
 
+        public async Task<Result> AddLikeFromUserAsync(Guid userId, Guid likedByUserId)
+        {
+            if(userId == Guid.Empty || likedByUserId == Guid.Empty)
+            {
+                _logger.LogError("AddLikeFromUserAsync: Ids can not be empty");
+                return Result.Failure(400, "Ids can not be empty");
+            }
+
+            var filter = Builders<UserActivities>.Filter.Eq(ua => ua.UserActivitiesId, userId);
+
+            var update = Builders<UserActivities>.Update.Push(ua => ua.LikesFromUsers, likedByUserId);
+
+            var result = await _collection.UpdateOneAsync(filter, update);
+
+            if(result.MatchedCount == 0)
+            {
+                _logger.LogError("AddLikeFromUserAsync: No activity found for UserId {UserId}", userId);
+                return Result.Failure(404, "No activity found for this UserId");
+            }
+
+            if (result.ModifiedCount == 0)
+            {
+                _logger.LogWarning("AddLikeFromUserAsync: Like from UserId {LikedByUserId} already exists for UserId {UserId}", likedByUserId, userId);
+                return Result.Failure(409, "Like from this UserId already exists");
+            }
+
+            _logger.LogInformation("AddLikeFromUserAsync: Successfully added like from UserId {LikedByUserId} to UserId {UserId}", likedByUserId, userId);
+            return Result.Success();
+        }
+
         public async Task<Result> CreateUserActivityAsync(Guid userId)
         {
             if(userId == Guid.Empty)
@@ -86,6 +116,28 @@ namespace RecomendationService.Infrastructure
             return Result<IEnumerable<Guid>>.Success(activity.LikedUsers);
         }
 
+        public async Task<Result<IEnumerable<Guid>>> GetLikesFromUsersAsync(Guid userId)
+        {
+            if(userId == Guid.Empty)
+            {
+                _logger.LogError("GetLikesFromUsersAsync: Id can not be empty");
+                return Result<IEnumerable<Guid>>.Failure(400, "Id can not be empty");
+            }
+
+            var filter = Builders<UserActivities>.Filter.Eq(ua => ua.UserActivitiesId, userId);
+
+            var activity = await (await _collection.FindAsync(filter)).FirstOrDefaultAsync();
+
+            if(activity == null)
+            {
+                _logger.LogError("GetLikesFromUsersAsync: No activity found for UserId {UserId}", userId);
+                return Result<IEnumerable<Guid>>.Failure(404, "No activity found for this UserId");
+            }
+
+            _logger.LogInformation("GetLikesFromUsersAsync: Retrieved likes from users for UserId {UserId}", userId);
+            return Result<IEnumerable<Guid>>.Success(activity.LikesFromUsers);
+        }
+
         public async Task<Result> RecordUserActivityAsync(Guid userId, Guid targetUserID, string activityType)
         {
             if(userId == Guid.Empty)
@@ -122,6 +174,35 @@ namespace RecomendationService.Infrastructure
             }
 
             _logger.LogInformation("RecordUserActivityAsync: succesfully added activity for {UserID}", userId);
+            return Result.Success();
+        }
+
+        public async Task<Result> RemoveLikeFromUserAsync(Guid userId, Guid likedByUserId)
+        {
+            if(userId == Guid.Empty || likedByUserId == Guid.Empty)
+            {
+                _logger.LogError("RemoveLikeFromUserAsync: Ids can not be empty");
+                return Result.Failure(400, "Ids can not be empty");
+            }
+
+            var filter = Builders<UserActivities>.Filter.Eq(ua => ua.UserActivitiesId, userId);
+            var update = Builders<UserActivities>.Update.Pull(ua => ua.LikesFromUsers, likedByUserId);
+
+            var result = await _collection.UpdateOneAsync(filter, update);
+
+            if(result.MatchedCount == 0)
+            {
+                _logger.LogError("RemoveLikeFromUserAsync: No activity found for UserId {UserId}", userId);
+                return Result.Failure(404, "No activity found for this UserId");
+            }
+
+            if (result.ModifiedCount == 0)
+            {
+                _logger.LogWarning("RemoveLikeFromUserAsync: Like from UserId {LikedByUserId} does not exist for UserId {UserId}", likedByUserId, userId);
+                return Result.Failure(409, "Like from this UserId does not exist");
+            }
+
+            _logger.LogInformation("RemoveLikeFromUserAsync: Successfully removed like from UserId {LikedByUserId} for UserId {UserId}", likedByUserId, userId);
             return Result.Success();
         }
     }

@@ -6,6 +6,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using RecomendationService.Application.RepositoryContracts;
 using RecomendationService.Domain;
+using RecomendationService.Application.HttpClientContracts;
 
 namespace RecomendationService.Infrastructure
 {
@@ -13,6 +14,11 @@ namespace RecomendationService.Infrastructure
     {
         public static IServiceCollection InfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddHttpClient<IProfileInfoProvider, ProfileInfoProvider>(options =>
+            {
+                options.BaseAddress = new Uri(configuration["ExternalURI"]!);
+            });
+
             services.AddScoped<IUserActivityRepository, UserActivityRepository>();
 
             var mongoClient = new MongoClient(configuration["ConnectionString"]!);

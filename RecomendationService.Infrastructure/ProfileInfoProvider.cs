@@ -3,6 +3,8 @@ using RecomendationService.Application;
 using RecomendationService.Application.HttpClientContracts;
 using RecomendationService.Domain;
 using System.Net.Http.Json;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace RecomendationService.Infrastructure
 {
@@ -24,7 +26,7 @@ namespace RecomendationService.Infrastructure
                 return Result<Profile>.Failure(400, "userID can not be empty");
             }
 
-            var result = await _client.GetAsync($"getProfileByID/{userID}");
+            var result = await _client.GetAsync($"{userID}");
 
             if(!result.IsSuccessStatusCode)
             {
@@ -32,7 +34,13 @@ namespace RecomendationService.Infrastructure
                 return Result<Profile>.Failure((int)result.StatusCode, "Failed to retrieve profile");
             }
 
-            var profile = await result.Content.ReadFromJsonAsync<Profile>();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            options.Converters.Add(new JsonStringEnumConverter());
+
+            var profile = await result.Content.ReadFromJsonAsync<Profile>(options);
 
             if(profile == null)
             {
@@ -60,7 +68,13 @@ namespace RecomendationService.Infrastructure
                 return Result<IEnumerable<Profile>>.Failure((int)result.StatusCode, "Failed to retrieve profiles");
             }
 
-            var profiles = await result.Content.ReadFromJsonAsync<IEnumerable<Profile>>();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            options.Converters.Add(new JsonStringEnumConverter());
+
+            var profiles = await result.Content.ReadFromJsonAsync<IEnumerable<Profile>>(options);
 
             _logger.LogInformation("GetProfiles: Successfully retrieved {Count} profiles", profiles?.Count() ?? 0);
             return Result<IEnumerable<Profile>>.Success(profiles ?? Enumerable.Empty<Profile>());

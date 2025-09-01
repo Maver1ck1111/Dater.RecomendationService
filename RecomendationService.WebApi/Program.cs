@@ -1,10 +1,18 @@
 using RecomendationService.Infrastructure;
 using RecomendationService.Application;
 using Serilog;
+using RecomendationService.Application.Services;
+using RecomendationService.Application.IServiceContracts;
+using RecomendationService.Application.RepositoryContracts;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 builder.Services.InfrastructureServices(builder.Configuration);
 builder.Services.ApplicationServices();

@@ -16,7 +16,7 @@ namespace RecomendationService.Infrastructure
         {
             services.AddHttpClient<IProfileInfoProvider, ProfileInfoProvider>(options =>
             {
-                options.BaseAddress = new Uri(configuration["ExternalURI"]!);
+                options.BaseAddress = new Uri(configuration["ExternalURI"]! + "profile/");
             });
 
             services.AddScoped<IUserActivityRepository, UserActivityRepository>();

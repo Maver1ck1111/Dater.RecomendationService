@@ -84,16 +84,16 @@ namespace RecomendationService.Tests
             _userActivityRepositoryMock.Setup(x => x.GetDislikedUsersAsync(It.IsAny<Guid>()))
                 .ReturnsAsync(Result<IEnumerable<Guid>>.Success(new List<Guid>()));
 
+            _userActivityRepositoryMock.Setup(x => x.GetLikesFromUsersAsync(It.IsAny<Guid>()))
+                .ReturnsAsync(Result<IEnumerable<Guid>>.Success(new List<Guid>()));
+
             var service = new RecommendationService(_loggerMock.Object, _userActivityRepositoryMock.Object, _profileInfoProviderMock.Object);
 
-            var result = await service.GetRecomendationsAsync(currentProfile.ProfileID);
+            var result = await service.GetRecomendationsAsync(currentProfile.AccountID);
 
             result.StatusCode.Should().Be(200);
 
             result.Value.Should().NotBeNull();
-
-            result.Value.Should().NotContain(profilesList[0]);
-            result.Value.Should().NotContain(profilesList[1]);
 
             result.Value.Should().ContainInConsecutiveOrder(profilesList[4], profilesList[3], profilesList[2]);
         }

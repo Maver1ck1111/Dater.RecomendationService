@@ -5,6 +5,7 @@ using RecomendationService.Domain;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using RecomendationService.Domain.Enums;
 
 namespace RecomendationService.Infrastructure
 {
@@ -52,7 +53,7 @@ namespace RecomendationService.Infrastructure
             return Result<Profile>.Success(profile);
         }
 
-        public async Task<Result<IEnumerable<Profile>>> GetProfilesByFilterAsync(IEnumerable<Guid> filterGuids)
+        public async Task<Result<IEnumerable<Profile>>> GetProfilesByFilterAsync(IEnumerable<Guid> filterGuids, Gender currentGender)
         {
             if(filterGuids == null || !filterGuids.Any())
             {
@@ -60,7 +61,9 @@ namespace RecomendationService.Infrastructure
                 return Result<IEnumerable<Profile>>.Failure(400, "filterGuids can not be null or empty");
             }
 
-            var result = await _client.PostAsJsonAsync("getProfilesByFilter", filterGuids);
+            string searchGender = currentGender == Gender.Male ? "Female" : "Male";
+
+            var result = await _client.PostAsJsonAsync($"getProfilesByFilter/{searchGender}", filterGuids);
 
             if(!result.IsSuccessStatusCode)
             {

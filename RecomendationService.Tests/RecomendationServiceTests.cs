@@ -27,7 +27,7 @@ namespace RecomendationService.Tests
                 Name = "Test",
                 DateOfBirth = new DateTime(2000, 10, 10),
                 Description = "test description",
-                Gender = Gender.Male,
+                Gender = Gender.Female,
                 FoodInterest = FoodInterest.Italian,
                 BookInterest = BookInterest.Fantasy,
                 SportInterest = SportInterest.Football,
@@ -75,7 +75,7 @@ namespace RecomendationService.Tests
                 }
             };
 
-            _profileInfoProviderMock.Setup(x => x.GetProfilesByFilterAsync(It.IsAny<IEnumerable<Guid>>()))
+            _profileInfoProviderMock.Setup(x => x.GetProfilesByFilterAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<Gender>()))
                 .ReturnsAsync(Result<IEnumerable<Profile>>.Success(profilesList));
 
             _userActivityRepositoryMock.Setup(x => x.GetLikedUsersAsync(It.IsAny<Guid>()))

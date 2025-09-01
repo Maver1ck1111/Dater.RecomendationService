@@ -61,7 +61,7 @@ namespace RecomendationService.Application.Services
                 .Append(userID)
                 .ToList();
 
-            var profilesResult = await _profileInfoProvider.GetProfilesByFilterAsync(exludedGuids);
+            var profilesResult = await _profileInfoProvider.GetProfilesByFilterAsync(exludedGuids, currentProfile.Gender);
 
             if(!profilesResult.IsSuccess)
             {

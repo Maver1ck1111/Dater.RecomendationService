@@ -89,7 +89,7 @@ namespace RecomendationService.Tests
 
             var service = new RecommendationService(_loggerMock.Object, _userActivityRepositoryMock.Object, _profileInfoProviderMock.Object);
 
-            var result = await service.GetRecomendationsAsync(currentProfile.AccountID);
+            var result = await service.GetRecomendationsAsync(currentProfile.AccountID, 2);
 
             result.StatusCode.Should().Be(200);
 
@@ -103,7 +103,7 @@ namespace RecomendationService.Tests
         {
             var service = new RecommendationService(_loggerMock.Object, _userActivityRepositoryMock.Object, _profileInfoProviderMock.Object);
 
-            var result = await service.GetRecomendationsAsync(Guid.Empty);
+            var result = await service.GetRecomendationsAsync(Guid.Empty, 2);
 
             result.StatusCode.Should().Be(400);
         }
@@ -116,7 +116,7 @@ namespace RecomendationService.Tests
 
             var service = new RecommendationService(_loggerMock.Object, _userActivityRepositoryMock.Object, _profileInfoProviderMock.Object);
 
-            var result = await service.GetRecomendationsAsync(Guid.NewGuid());
+            var result = await service.GetRecomendationsAsync(Guid.NewGuid(), 2);
 
             result.StatusCode.Should().Be(404);
         }
@@ -129,7 +129,7 @@ namespace RecomendationService.Tests
 
             var service = new RecommendationService(_loggerMock.Object, _userActivityRepositoryMock.Object, _profileInfoProviderMock.Object);
 
-            var result = await service.GetRecomendationsAsync(Guid.NewGuid());
+            var result = await service.GetRecomendationsAsync(Guid.NewGuid(), 2);
 
             result.StatusCode.Should().Be(500);
         }

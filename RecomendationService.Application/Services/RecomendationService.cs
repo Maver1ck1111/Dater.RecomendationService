@@ -17,7 +17,7 @@ namespace RecomendationService.Application.Services
             _userActivityRepository = userActivityRepository;
             _profileInfoProvider = profileInfoProvider;
         }
-        public async Task<Result<IEnumerable<Profile>>> GetRecomendationsAsync(Guid userID)
+        public async Task<Result<IEnumerable<Profile>>> GetRecomendationsAsync(Guid userID, int countOfUsers = 30)
         {
             if(userID == Guid.Empty)
             {
@@ -73,7 +73,8 @@ namespace RecomendationService.Application.Services
 
             var sortedProfiles = profilesMatch
                 .OrderByDescending(x => x.Item2)
-                .Select(x => x.Item1);
+                .Select(x => x.Item1)
+                .Take(countOfUsers);
             
             _logger.LogInformation("GetRecomendationsAsync: Successfully retrieved {Count} recommendations for userID {UserID}", sortedProfiles.Count(), userID);
             return Result<IEnumerable<Profile>>.Success(sortedProfiles);

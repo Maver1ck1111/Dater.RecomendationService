@@ -9,6 +9,6 @@ namespace RecomendationService.Application.IServiceContracts
 {
     public interface IRecommendationService
     {
-        Task<Result<IEnumerable<Profile>>> GetRecomendationsAsync(Guid userID);
+        Task<Result<IEnumerable<Profile>>> GetRecomendationsAsync(Guid userID, int countOfUsers = 30);
     }
 }

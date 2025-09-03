@@ -52,7 +52,15 @@ namespace RecomendationService.Application.Services
                 || userActivitiesLikedUsersResult.StatusCode == 404)
             {
                 _logger.LogError("GetRecomendationsAsync: User activity with {userID} is not found", userID);
-                return Result<IEnumerable<Profile>>.Failure(404, "Activity is not found");
+                return Result<IEnumerable<Profile>>.Failure(404, $"Activity with {userID} is not found");
+            }
+
+            if (!userActivitiesLikesResult.IsSuccess 
+                || !userActivitiesDislikesResult.IsSuccess 
+                || !userActivitiesLikedUsersResult.IsSuccess)
+            {
+                _logger.LogError("GetRecomendationsAsync: Error while getting user activities for user with {userID}", userID);
+                return Result<IEnumerable<Profile>>.Failure(500, "Error while getting user activities");
             }
 
             List<Guid> exludedGuids = userActivitiesLikesResult.Value

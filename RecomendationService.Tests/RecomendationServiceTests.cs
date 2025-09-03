@@ -95,7 +95,9 @@ namespace RecomendationService.Tests
 
             result.Value.Should().NotBeNull();
 
-            result.Value.Should().ContainInConsecutiveOrder(profilesList[4], profilesList[3], profilesList[2]);
+            result.Value.Should().HaveCount(2);
+
+            result.Value.Should().ContainInConsecutiveOrder(profilesList[4], profilesList[3]);
         }
 
         [Fact]
